@@ -1,6 +1,52 @@
 const where = require("sequelize");
 const RevistaModel = require("../models/RevistaModels.js");
+const EventoModel = require("../models/EventoModels.js");
 //Mostrar todos los registros
+module.exports = getAllAreasAndEvents = async (req, res) => {
+    try {
+        // Obtener todas las áreas
+        const areas = await RevistaModel.findAll();
+        
+        // Obtener todos los eventos
+        //const eventos = await EventoModel.findAll();
+
+        const eventos6 = await EventoModel.findAll({
+            where:{
+                fecha:{
+                    [Op.lte]: new Date() 
+                }
+            },
+            order:[['fecha', 'desc']],
+            limit: 1
+        })
+        
+        // Enviar ambos en la respuesta
+        res.json({
+            areas: areas,
+            //eventos: eventos,
+            eventos6: eventos6,
+        });
+    } catch (error) {
+        res.json({ message: error.message });
+    }
+};
+module.exports = get6Events = async (req, res) =>{
+    try{
+        const eventos6 = await EventoModel.findAll({
+            where:{
+                fecha:{
+                    [Op.lte]: new Date() 
+                }
+            },
+            order:[['fecha', 'desc']],
+            limit: 6
+        })
+
+    }catch(error){
+        res.json({ message: error.message });
+    }
+}
+
 module.exports = getAllAreas = async (req, res) =>{
     try{
         const areas = await RevistaModel.findAll()
@@ -12,9 +58,9 @@ module.exports = getAllAreas = async (req, res) =>{
 //Mostrar un registro
 module.exports = getArea = async(req, res)=>{
     try{
-        const area = RevistaModel.findAll({
+        const area = await RevistaModel.findAll({
             where:{
-                id:req.params.id
+                idarea:req.params.id
             }
         })
         res.json(area)
@@ -37,7 +83,7 @@ module.exports = createArea = async(req,res)=>{
 module.exports = updateArea = async(req,res)=>{
     try{
         await RevistaModel.update(req.body,{
-            where:{id:req.params.id}
+            where:{idarea:req.params.id}
         })
         res.json({
             "message":"Registro actualizado correctamente"
